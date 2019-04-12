@@ -65,7 +65,7 @@ function [] = general_modeling(dataset_idx, feature_idx,...
 %     end    
     
     %% Finishing    
-    delete([directory, 'labels.mat']);
-    delete([directory, 'features.mat']);
+    delete([directory, '/labels.mat']);
+    delete([directory, '/features.mat']);
 
 end

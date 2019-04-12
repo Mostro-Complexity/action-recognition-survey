@@ -1,7 +1,6 @@
 function [total_accuracy, class_wise_accuracy, confusion_matrix]...
     = naive_bayes_nearest_neighbor(features_train, features_test, tr_labels, te_labels, ~)
 
-
     n_tr_samples = length(features_train);
     n_te_samples = length(features_test);
     unique_classes = unique(tr_labels);
@@ -12,12 +11,11 @@ function [total_accuracy, class_wise_accuracy, confusion_matrix]...
 
     for video_ind = 1:n_te_samples
         video = features_test{video_ind};
-        video_class = te_labels(video_ind);
 
         each_frame_dist = zeros(n_classes, 1);
         for c = 1:n_classes
 
-            videos_in_c = features_train(tr_labels == c);
+            videos_in_c = features_train(tr_labels == unique_classes(c));
             frames_in_c = cell2mat(videos_in_c');
             nn_ind = knnsearch(frames_in_c', video');
 
@@ -36,7 +34,7 @@ function [total_accuracy, class_wise_accuracy, confusion_matrix]...
     % evaluation
     class_wise_accuracy = zeros(n_classes, 1);    
     confusion_matrix = zeros(n_classes, n_classes);    
-    for c = 1:n_classes
+    for c = 1:n_classes     % arranged by order
         temp = find(te_labels == c);
         class_wise_accuracy(c) =...
             length(find(final_predicted_labels(temp) == c)) / length(temp);

@@ -127,8 +127,8 @@ function [] = warped_pyramid_fourier_modeling(...
     
     
     %% Finishing    
-    delete([directory, 'labels.mat']);
-    delete([directory, 'features.mat']);
+    delete([directory, '/labels.mat']);
+    delete([directory, '/features.mat']);
     rmdir([directory, '/dtw_warped_features'], 's');
     rmdir([directory, '/dtw_warped_fourier_features'], 's');
     rmdir([directory, '/dtw_warped_pyramid_lf_fourier_kernels'], 's');

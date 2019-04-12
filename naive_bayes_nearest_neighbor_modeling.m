@@ -6,6 +6,7 @@ function [] = naive_bayes_nearest_neighbor_modeling(dataset_idx, feature_idx,...
     
     addpath(genpath('./time_modeling'))
     addpath(genpath('./data'))
+    addpath(genpath('./classification'))
 
 
     if (feature_idx > 10)
@@ -58,15 +59,15 @@ function [] = naive_bayes_nearest_neighbor_modeling(dataset_idx, feature_idx,...
     naive_bayes_nearest_neighbor_classification(directory, labels.subject_labels,...
         labels.action_labels, tr_info.tr_subjects, tr_info.te_subjects, action_names.action_names);
 
-%     if (strcmp(datasets{dataset_idx}, 'MSRAction3D'))
-%         wpf_classification_with_subsets(directory, labels.subject_labels,...
-%             labels.action_labels, tr_info.tr_subjects, tr_info.te_subjects,...
-%             tr_info.action_sets, action_names.action_names);
-%     end    
+    if (strcmp(datasets{dataset_idx}, 'MSRAction3D'))
+        nbnn_classification_with_subsets(directory, labels.subject_labels,...
+            labels.action_labels, tr_info.tr_subjects, tr_info.te_subjects,...
+            tr_info.action_sets, action_names.action_names);
+    end    
     
     %% Finishing    
-    delete([directory, 'labels.mat']);
-    delete([directory, 'features.mat']);
+    delete([directory, '/labels.mat']);
+    delete([directory, '/features.mat']);
 
 
 end
