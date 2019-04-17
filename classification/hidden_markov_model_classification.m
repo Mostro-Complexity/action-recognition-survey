@@ -1,5 +1,6 @@
-function [] = naive_bayes_nearest_neighbor_classification(root_dir,...
-    subject_labels, action_labels, tr_subjects, te_subjects, action_names) 
+function [] = hidden_markov_model_classification(root_dir,...
+    subject_labels, action_labels, tr_subjects, te_subjects, action_names)
+
 
     n_tr_te_splits = size(tr_subjects, 1);
     n_classes = length(unique(action_labels));   
@@ -13,8 +14,8 @@ function [] = naive_bayes_nearest_neighbor_classification(root_dir,...
     confusion_matrices = cell(n_tr_te_splits, 1);
         
     for i = 1:n_tr_te_splits         
-        tr_subject_ind = ismember(subject_labels, tr_subjects(i,:));
-        te_subject_ind = ismember(subject_labels, te_subjects(i,:));        
+        tr_subject_ind = ismember(subject_labels, tr_subjects(i, :));
+        te_subject_ind = ismember(subject_labels, te_subjects(i, :));        
         tr_labels = action_labels(tr_subject_ind);
         te_labels = action_labels(te_subject_ind);
             
@@ -24,11 +25,11 @@ function [] = naive_bayes_nearest_neighbor_classification(root_dir,...
         
         features_train = features(tr_subject_ind);
         features_test = features(te_subject_ind);
- 
+
+        
         % classifier
         [total_accuracy(i), cw_accuracy(i, :), confusion_matrices{i}] =...
-            naive_bayes_nearest_neighbor(features_train,...
-            features_test, tr_labels, te_labels);
+            hidden_markov_model(features_train, features_test, tr_labels, te_labels);
 
     end
 
@@ -41,7 +42,7 @@ function [] = naive_bayes_nearest_neighbor_classification(root_dir,...
     end
     avg_confusion_matrix = avg_confusion_matrix / length(confusion_matrices); 
 
-    results_dir = [root_dir, '/nbnn_modeling_results'];
+    results_dir = [root_dir, '/hmm_modeling_results'];
     results_saving(results_dir,...
         total_accuracy,...
         cw_accuracy,...
@@ -50,6 +51,5 @@ function [] = naive_bayes_nearest_neighbor_classification(root_dir,...
         confusion_matrices,...
         avg_confusion_matrix,...
         action_names);
-
 end
 

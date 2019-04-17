@@ -29,21 +29,21 @@ function [total_accuracy, class_wise_accuracy, confusion_matrix]...
         [~, predicted_ind(video_ind)] = min(each_frame_dist);
     end
     
-    final_predicted_labels = unique_classes(predicted_ind);
+    predicted_labels = unique_classes(predicted_ind);
     
     % evaluation
     class_wise_accuracy = zeros(n_classes, 1);    
     confusion_matrix = zeros(n_classes, n_classes);    
-    for c = 1:n_classes     % arranged by order
-        temp = find(te_labels == c);
-        class_wise_accuracy(c) =...
-            length(find(final_predicted_labels(temp) == c)) / length(temp);
+    for i = 1:n_classes     % arranged by order
+        temp = find(te_labels == unique_classes(i));
+        class_wise_accuracy(i) =...
+            length(find(predicted_labels(temp) == unique_classes(i))) / length(temp);
         
-         confusion_matrix(c, :) = hist(final_predicted_labels(temp),...
-             unique(tr_labels)) / length(temp);
+         confusion_matrix(i, :) = hist(predicted_labels(temp),...
+             unique_classes) / length(temp);
     end
     
-    total_accuracy = length(find(te_labels == final_predicted_labels))...
+    total_accuracy = length(find(te_labels == predicted_labels))...
         / n_te_samples;
 
 end
