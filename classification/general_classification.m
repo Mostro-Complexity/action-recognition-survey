@@ -48,14 +48,14 @@ function [] = general_classification(root_dir, subject_labels,...
 
     end
 
-    avg_total_accuracy = mean(total_accuracy); %#ok<NASGU>
-    avg_cw_accuracy = mean(cw_accuracy); %#ok<NASGU>
+    avg_total_accuracy = mean(total_accuracy); 
+    avg_cw_accuracy = mean(cw_accuracy); 
 
     avg_confusion_matrix = zeros(size(confusion_matrices{1}));
     for i = 1:length(confusion_matrices)
         avg_confusion_matrix = avg_confusion_matrix + confusion_matrices{i};
     end
-    avg_confusion_matrix = avg_confusion_matrix / length(confusion_matrices); %#ok<NASGU>
+    avg_confusion_matrix = avg_confusion_matrix / length(confusion_matrices); 
     
     results_dir = [root_dir, '/general_modeling_result'];
     results_saving(results_dir,...

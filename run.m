@@ -55,7 +55,8 @@
 % toc
 
 %% hmm model
-feature_types = {'absolute_joint_positions', ...
+% 'histograms_of_joint',
+feature_types = { 'absolute_joint_positions', ...
     'relative_joint_positions', 'eigenjoints'};
 
 datasets = {'MSRAction3D'};

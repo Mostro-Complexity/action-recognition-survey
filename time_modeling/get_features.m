@@ -52,7 +52,14 @@ function [features] = get_features(feature_type, joint_locations, body_model, n_
 
         features = get_trajectory_3_features(joint_locations,...
             body_model, n_desired_frames);
+        
+        
+    elseif (strcmp(feature_type, 'histograms_of_joint'))
+        
+        features = get_histograms_of_joint(joint_locations,...
+            body_model, n_desired_frames);
 
+        
     else
         error('Unknown feature type');
     end
