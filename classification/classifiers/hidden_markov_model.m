@@ -9,7 +9,7 @@ function [total_accuracy, class_wise_accuracy, confusion_matrix]...
     n_te_samples = length(features_test);
     
     n_states = n_classes; % ???
-    n_clusters = 200;
+    n_clusters = 300;
     
     A_of_models = cell(n_classes, 1);
     B_of_models = cell(n_classes, 1);

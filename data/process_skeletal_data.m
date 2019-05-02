@@ -1,3 +1,4 @@
+% Notice: This file will be deleted in future
 function [] = process_skeletal_data(dataset)
 
     dbstop if error
@@ -191,7 +192,7 @@ function [] = process_skeletal_data(dataset)
 
     elseif (strcmp(dataset, 'MSRAction3D'))
         
-        dir = [dataset,'/real_world_coordinates'];
+        dir = [dataset,'/MSRAction3DSkeletonReal3D'];
         load([dataset, '/files_used'])
         load([dataset, '/body_model'])
 
@@ -266,7 +267,7 @@ function [] = process_skeletal_data(dataset)
             end
         end
 
-        save([dataset, '/skeletal_data'], 'skeletal_data', 'skeletal_data_validity');
+        save('/skeletal_data', 'skeletal_data', 'skeletal_data_validity');
 
     else
         error('Unknwon dataset');

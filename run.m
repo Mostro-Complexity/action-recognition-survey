@@ -8,7 +8,7 @@
 
 
 %% super awesome model testing
-% writing by others
+% written by others
 
 % feature_types = {'absolute_joint_positions', 'relative_joint_positions', ...
 %     'eigenjoints'};
@@ -63,7 +63,7 @@ datasets = {'MSRAction3D'};
 
 tic
 for i = 1:length(datasets)
-    for j = 1:length(feature_types)
+    parfor j = 1:length(feature_types)
         hidden_markov_model_modeling(i, j, feature_types, datasets);
     end
 end
