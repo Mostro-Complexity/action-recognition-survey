@@ -21,30 +21,14 @@ function [] = general_classification(root_dir, subject_labels,...
         data = load ([root_dir, '/', loadname], loadname);
         
         features = data.(loadname);
-        [dim_2, dim_3] = size(features{1});
         
-        feature_to_classify = zeros(length(features), dim_2, dim_3);
-        for j=length(features)
-            feature_to_classify(j, :, :) = features{j};
-        end
-        
-        dim_1 = size(feature_to_classify, 1);
-        feature_to_classify = reshape(feature_to_classify, dim_1, dim_2 * dim_3);
-        
-        features_train = cell(n_classes, 1);
-        features_test = cell(n_classes, 1);
-
-        for class = 1:n_classes
-            
-            features_train{class} = feature_to_classify(tr_subject_ind, :);
-            features_test{class} = feature_to_classify(te_subject_ind, :);
-        
-        end
-
-        
+        features_train = features(tr_subject_ind);
+        features_test = features(te_subject_ind);
+ 
+        % classifier
         [total_accuracy(i), cw_accuracy(i, :), confusion_matrices{i}] =...
-            kernel_svm_one_vs_all_modified(features_train,...
-            features_test, tr_labels, te_labels, C_val);
+            support_vector_machine(features_train,...
+            features_test, tr_labels, te_labels);
 
     end
 

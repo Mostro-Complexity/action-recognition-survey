@@ -26,18 +26,18 @@
 
 %% my stupid model
 % 
-% feature_types = {'absolute_joint_positions', 'relative_joint_positions', ...
-%     'eigenjoints'};
-% 
-% datasets = {'MSRAction3D'};
-% 
-% tic
-% for i = 1:length(datasets)
-%     for j = 1:length(feature_types)
-%         general_modeling(i, j, feature_types, datasets);
-%     end
-% end
-% toc
+feature_types = {'absolute_joint_positions', 'relative_joint_positions', ...
+    'eigenjoints'};
+
+datasets = {'MSRAction3D'};
+
+tic
+for i = 1:length(datasets)
+    parfor j = 1:length(feature_types)
+        general_modeling(i, j, feature_types, datasets);
+    end
+end
+toc
 
 %% nbnn model
 % 'histograms_of_3D_joint_locations ',
@@ -56,15 +56,15 @@
 
 %% hmm model
 % 'histograms_of_joint',
-feature_types = { 'absolute_joint_positions', ...
-    'relative_joint_positions', 'eigenjoints'};
-
-datasets = {'MSRAction3D'};
-
-tic
-for i = 1:length(datasets)
-    parfor j = 1:length(feature_types)
-        hidden_markov_model_modeling(i, j, feature_types, datasets);
-    end
-end
-toc
+% feature_types = { 'absolute_joint_positions', ...
+%     'relative_joint_positions', 'eigenjoints'};
+% 
+% datasets = {'MSRAction3D'};
+% 
+% tic
+% for i = 1:length(datasets)
+%     parfor j = 1:length(feature_types)
+%         hidden_markov_model_modeling(i, j, feature_types, datasets);
+%     end
+% end
+% toc

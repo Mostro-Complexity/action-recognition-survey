@@ -20,6 +20,7 @@ function draw_confusion_matrix(mat, tick)
     set(gca, 'XTick', 1:n_classes, 'YTick', 1:n_classes);
     set(gca,'yticklabel',tick);
     set(gca,'TickLength',[0.005, 0.001]);
+    set(gcf,'position',[500,300,808,420]);
     xtickangle(50)
 
 end 

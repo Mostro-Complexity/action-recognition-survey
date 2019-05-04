@@ -37,8 +37,9 @@ function integrate_depth_videos
                     % normalization            
                     video_array = cell2mat(video); 
                     video_array = reshape(video_array, frame_length * frame_width, n_frames);   
-                    video_array = mapminmax(video_array', 0, 1)';             
                     video_array = zscore(video_array);
+                    % video_array = mapminmax(video_array', -1, 1)'; 
+                    % video_array = video_array./max(abs(video_array));
                     video_array = reshape(video_array, frame_length, frame_width, n_frames);  
                  
                     % bounding box cutting and resize frames

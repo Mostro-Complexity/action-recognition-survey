@@ -159,9 +159,9 @@ def network_construction():
 
     model.add(Flatten())
     model.add(Dense(2056, init='normal', activation='linear'))
-    model.add(Dropout(0.5))
+    model.add(Dropout(0.6))
     model.add(Dense(512, init='normal', activation='linear'))
-    model.add(Dropout(0.5))#TODO:consider to make it less??
+    model.add(Dropout(0.5))
     model.add(Dense(128, init='normal', activation='linear'))
     #model.add(Dropout(0.5))
     model.add(Dense(n_classes, init='normal'))
