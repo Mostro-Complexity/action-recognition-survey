@@ -1,6 +1,7 @@
-function [total_accuracy, class_wise_accuracy, confusion_matrix] =...
-    support_vector_machine(features_train, features_test, tr_labels, te_labels, ~)
-    
+function [total_accuracy, class_wise_accuracy, confusion_matrix]...
+    = fusion_svm_model(features_train, features_test, advanced_features_tr,...
+    advanced_featreus_te, tr_labels, te_labels)
+
     n_tr_samples = length(features_train);
     n_te_samples = length(features_test);
     unique_classes = unique(tr_labels);
@@ -13,23 +14,12 @@ function [total_accuracy, class_wise_accuracy, confusion_matrix] =...
     features_test = cell2mat(features_test');
     features_test = reshape(features_test, n_dim * n_frames, n_te_samples);
     
-    models = cell(n_classes, 1);
-
-    % training
-    for c=1:n_classes        
-        labels_for_fit = tr_labels;
-        labels_for_fit(tr_labels == c) = 1;
-        labels_for_fit(tr_labels ~= c) = 0;
-        
-        models{c} = fitcsvm(features_train', labels_for_fit);
-    end
+    features_train = [features_train;advanced_features_tr'];
+    features_test = [features_test;advanced_featreus_te'];
+     
+    model = fitcecoc(features_train',tr_labels);
     
-    predicted_labels = zeros(n_te_samples, 1);
-
-    for c=1:n_classes
-        index = predict(models{c}, features_test');
-        predicted_labels(logical(index)) = c;
-    end
+    predicted_labels = predict(model, features_test');
     
     % evaluation
     class_wise_accuracy = zeros(n_classes, 1);    
@@ -45,7 +35,6 @@ function [total_accuracy, class_wise_accuracy, confusion_matrix] =...
     
     total_accuracy = length(find(te_labels == predicted_labels))...
         / n_te_samples;
-
 
 end
 

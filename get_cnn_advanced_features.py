@@ -6,11 +6,10 @@ import numpy as np
 from keras import backend
 from keras.layers.convolutional import Convolution3D, MaxPooling3D
 from keras.layers.core import Activation, Dense, Dropout, Flatten
-from keras.models import Sequential, load_model
-from keras.optimizers import SGD, RMSprop
+from keras.models import Sequential, Model
+from keras.optimizers import RMSprop, SGD
 from keras.preprocessing.image import ImageDataGenerator
-from keras.utils import generic_utils, np_utils
-from pandas import crosstab
+from keras.utils import np_utils
 from sklearn.metrics import accuracy_score, confusion_matrix
 import hdf5storage
 
@@ -23,11 +22,11 @@ VIDEO_LENGTH, IM_LENGTH, IM_WIDTH = 38, 32, 32
 
 def load_dataset_param(splits_path, skeletal_data_path):
     """Train-test validation info and the validity of dataset
-    
+
     Arguments:
         splits_path {str} -- File path of train-test validation info 
         skeletal_data_path {str} -- File path of validity info of dataset
-    
+
     Returns:
         tr_subjects {numpy.array} -- Training subjects indices
         te_subjects {numpy.array} -- Test subjects indices
@@ -56,7 +55,7 @@ def save_eval_results(output_dir, total_accurary, confusion_matrics):
         u'avg_total_accurary': avg_total_accurary,
         u'avg_confusion_matrix': avg_confusion_matrix
     }
-    hdf5storage.savemat(''.join([output_dir, 'classification_results.mat']),
+    hdf5storage.savemat('/'.join([output_dir, 'classification_results.mat']),
                         matfiledata)
 
 
@@ -74,9 +73,10 @@ def get_videos_info(validity):
                 if validity[e, s, a] == 1:
                     video_names[count] = "a%02d_s%02d_e%02d_sdepth.mat" % (
                         a + 1, s + 1, e + 1)
-                    action_labels[count] = a  # indices(labels) start from 0
-                    subject_labels[count] = s
-                    instance_labels[count] = e
+                    # indices(labels) start from 1
+                    action_labels[count] = a + 1
+                    subject_labels[count] = s + 1
+                    instance_labels[count] = e + 1
                     count += 1
 
     return video_names, action_labels, subject_labels, instance_labels
@@ -115,7 +115,7 @@ def batches_generator(video_dir, video_names, video_labels, n_classes, batch_siz
                     video = f['video_array'][:].swapaxes(1, 2)
 
                     X_batch[j, 0, :, :, :] = video
-                    y_batch[j, :] = video_labels[i * batch_size + j, :]
+                    y_batch[j, :] = video_labels[i * batch_size + j]
 
                 yield X_batch[:n_sequence - i * batch_size], y_batch[:n_sequence - i * batch_size]
                 continue  # end the loop once
@@ -127,7 +127,7 @@ def batches_generator(video_dir, video_names, video_labels, n_classes, batch_siz
                 video = f['video_array'][:].swapaxes(1, 2)
 
                 X_batch[j, 0, :, :, :] = video
-                y_batch[j, :] = video_labels[i * batch_size + j, :]
+                y_batch[j, :] = video_labels[i * batch_size + j]
 
             yield X_batch, y_batch
 
@@ -142,36 +142,43 @@ def network_construction():
         kernel_dim3=5,  # cols
         input_shape=(1, n_frames, img_row, img_col),
         activation='relu',
-        strides=1
+        strides=1,
+        padding='same',
+        name='CL1'
     ))
-    model.add(MaxPooling3D(pool_size=(2, 2, 2), padding='same'))
+    model.add(MaxPooling3D(pool_size=(2, 2, 2), name='MP1'))
     model.add(Convolution3D(
         128,  # number of kernel
         kernel_dim1=5,  # depth
         kernel_dim2=5,  # rows
         kernel_dim3=5,  # cols
         activation='relu',
-        strides=1
+        strides=1,
+        padding='same',
+        name='CL2'
     ))
-    model.add(MaxPooling3D(pool_size=(2, 2, 2), padding='same'))
+    model.add(MaxPooling3D(pool_size=(2, 2, 2), name='MP2'))
 
     model.add(Dropout(0.5))
 
     model.add(Flatten())
-    model.add(Dense(2056, init='normal', activation='linear'))
-    model.add(Dropout(0.6))
-    model.add(Dense(512, init='normal', activation='linear'))
+    model.add(Dense(2056, init='normal', activation='linear', name='FC1'))
     model.add(Dropout(0.5))
-    model.add(Dense(128, init='normal', activation='linear'))
-    #model.add(Dropout(0.5))
+    model.add(Dense(512, init='normal', activation='linear', name='FC2'))
+    model.add(Dropout(0.5))
+    model.add(Dense(128, init='normal', activation='linear', name='FC3'))
+    # model.add(Dropout(0.5))
     model.add(Dense(n_classes, init='normal'))
 
     model.add(Activation('softmax'))
 
     model.compile(loss='categorical_crossentropy',
-                  optimizer=RMSprop(lr=0.0002),
+                  optimizer=RMSprop(lr=0.0001),
                   metrics=['mse', 'accuracy'])
-    return model
+
+    feature_model = Model(inputs=model.input,
+                          outputs=model.get_layer('FC2').output)
+    return model, feature_model
 
 
 if __name__ == "__main__":
@@ -179,6 +186,14 @@ if __name__ == "__main__":
     backend.set_image_dim_ordering('th')
 
     for dataset in DATASET:
+        output_dir = dataset + '_experiments/advanced_features'
+        if not os.path.exists(output_dir):
+            os.makedirs(output_dir)
+
+        features_dir = ''.join(['data/', dataset, '/Advanced_Feat_Mat'])
+        if not os.path.exists(features_dir):
+            os.makedirs(features_dir)
+
         video_dir = ''.join(['data/', dataset, '/Depth_Mat'])
 
         splits_path = ''.join(['data/', dataset, '/tr_te_splits.mat'])
@@ -195,7 +210,7 @@ if __name__ == "__main__":
 
         n_tr_te_splits = tr_subjects.shape[0]
 
-        batch_size = 128
+        batch_size = 80
         img_row, img_col, n_frames = 32, 32, 38
         unique_classes = np.unique(action_labels)
         n_classes = len(np.unique(action_labels))
@@ -209,19 +224,31 @@ if __name__ == "__main__":
                 video_info, tr_subjects[i, :], te_subjects[i, :])
 
             # convert class vectors to binary class matrices
-            tr_labels = np_utils.to_categorical(tr_labels, n_classes)
-            te_labels = np_utils.to_categorical(te_labels, n_classes)
+            tr_labels = np_utils.to_categorical(tr_labels - 1, n_classes)
+            te_labels = np_utils.to_categorical(te_labels - 1, n_classes)
 
             n_steps = np.ceil(tr_labels.shape[0] / batch_size)
 
+            # network training
             gen = batches_generator(
                 video_dir, tr_names, tr_labels, n_classes, batch_size)
 
-            model = network_construction()
-            model.fit_generator(generator=gen, epochs=80,
+            model, feature_model = network_construction()
+            model.fit_generator(generator=gen, epochs=60,
                                 steps_per_epoch=n_steps)
 
-            # evaluation
+            # features extraction
+            n_steps = np.ceil(action_labels.shape[0] / batch_size)
+            gen = batches_generator(
+                video_dir, video_names, action_labels, n_classes, batch_size)
+            advanced_features = feature_model.predict_generator(
+                generator=gen, steps=n_steps)
+            hdf5storage.savemat(
+                features_dir + '/advanced_split_%d' % (i + 1),
+                {u'advanced_features': advanced_features}
+            )
+
+            # network evaluation
             n_steps = np.ceil(te_labels.shape[0] / batch_size)
 
             gen = batches_generator(
@@ -231,14 +258,14 @@ if __name__ == "__main__":
             print('Metrics Names:\n', model.metrics_names,
                   '\nMetrics Values:\n', metrics_values)
 
-            # prediction
+            # network prediction
             gen = batches_generator(
                 video_dir, te_names, te_labels, n_classes, batch_size)
             pr_labels = model.predict_generator(generator=gen, steps=n_steps)
 
             # convert binary class matrices to class vectors
-            te_labels = np.argmax(te_labels, axis=-1)
-            pr_labels = np.argmax(pr_labels, axis=-1)
+            te_labels = np.argmax(te_labels, axis=-1) + 1
+            pr_labels = np.argmax(pr_labels, axis=-1) + 1
 
             total_acc = accuracy_score(te_labels, pr_labels)
             print('Split %d finished,total accuracy:%f' % (i + 1, total_acc))
@@ -248,8 +275,10 @@ if __name__ == "__main__":
             cm = cm.astype(float) / cm.sum(axis=-1)[:, np.newaxis]
             confusion_matrics[i, :, :] = cm
 
-        print('Average accuracy:%f' % total_accuracy.mean(axis=-1))
+            # avoiding OOM
+            backend.clear_session()
 
-        output_dir = 'MSRAction3D_experiments/learned_representation'
-        save_eval_results(output_dir, total_accuracy, confusion_matrics)
+        print('Average accuracy:%f' % total_accuracy.mean(axis=-1))
+        save_eval_results(output_dir + '/conv_net',
+                          total_accuracy, confusion_matrics)
     pass

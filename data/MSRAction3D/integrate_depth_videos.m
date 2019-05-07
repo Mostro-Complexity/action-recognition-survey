@@ -33,23 +33,24 @@ function integrate_depth_videos
 
                     video = load_depth_map(filename);
                     n_frames = length(video);
-                    
-                    % normalization            
                     video_array = cell2mat(video); 
-                    video_array = reshape(video_array, frame_length * frame_width, n_frames);   
-                    video_array = zscore(video_array);
-                    % video_array = mapminmax(video_array', -1, 1)'; 
-                    % video_array = video_array./max(abs(video_array));
-                    video_array = reshape(video_array, frame_length, frame_width, n_frames);  
-                 
+                    video_array = reshape(video_array, frame_length, frame_width, n_frames);   
+                    
                     % bounding box cutting and resize frames
                     video_array = cut_bounding_box(video_array, desired_length, desired_width);
-
+                                   
                     % video resizing and interpolation
                     video_array = imresize3(video_array,...
                         [desired_length, desired_width, desired_frames]);
-                    
-                    % resize time length of depth sequence
+
+                    % normalization            
+                    video_array = reshape(video_array,...
+                        desired_length * desired_length, desired_frames);   
+                    % video_array = zscore(video_array);
+                    video_array = mapminmax(video_array', 0, 1)'; 
+                    % video_array = video_array./max(abs(video_array));
+                    video_array = reshape(video_array,...
+                        desired_length, desired_length, desired_frames);  
 
                     filename = [videos_dir, '/', sprintf('a%02i_s%02i_e%02i_sdepth',a,s,e)];             
                     save(filename, 'video_array');
