@@ -50,9 +50,9 @@ def save_eval_results(output_dir, total_accurary, confusion_matrics):
     avg_confusion_matrix = confusion_matrics.mean(axis=0)
 
     matfiledata = {
-        u'total_accurary': total_accurary,
+        u'total_accuracy': total_accurary,
         u'confusion_matrics': confusion_matrics,
-        u'avg_total_accurary': avg_total_accurary,
+        u'avg_total_accuracy': avg_total_accurary,
         u'avg_confusion_matrix': avg_confusion_matrix
     }
     hdf5storage.savemat('/'.join([output_dir, 'classification_results.mat']),

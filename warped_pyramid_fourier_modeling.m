@@ -54,11 +54,11 @@ function [] = warped_pyramid_fourier_modeling(...
     generate_features(directory, datasets{dataset_idx}, feature_types{feature_idx}, desired_frames);
 
     
-    %% Dimensionality descent
-    disp ('Dimensionality descent')
-    data = load([directory, '/features'], 'features');
-    features = reduce_dimensionality(data.features, 500);
-    save([directory, '/features'], 'features');
+%     %% Dimensionality descent
+%     disp ('Dimensionality descent')
+%     data = load([directory, '/features'], 'features');
+%     features = reduce_dimensionality(data.features, 500);
+%     save([directory, '/features'], 'features');
     
     
     %% Temporal modeling
@@ -73,14 +73,15 @@ function [] = warped_pyramid_fourier_modeling(...
 
     for tr_split = 1:n_tr_te_splits
         for tr_action = 1:n_actions
-            % DTW
-%             loadname = [directory, '/features'];
-%             data = load(loadname, 'features');
 
+            loadname = [directory, '/features'];
+            data = load(loadname, 'features');
+            
+            % DTW
             savename = [directory, '/dtw_warped_features/warped_features_split_',...
                 num2str(tr_split), '_class_', num2str(tr_action)];
 
-            get_warped_features(features, labels.action_labels,...
+            get_warped_features(data.features, labels.action_labels,...
                 labels.subject_labels, tr_info.tr_subjects(tr_split, :), tr_action, savename);
 
 
@@ -88,25 +89,23 @@ function [] = warped_pyramid_fourier_modeling(...
             loadname = [directory, '/dtw_warped_features/warped_features_split_',...
                 num2str(tr_split), '_class_', num2str(tr_action)];    
             data = load(loadname, 'warped_features');
-            warped_features = data.warped_features;
 
             savename = [directory, '/dtw_warped_fourier_features/warped_fourier_features_split_',...
                 num2str(tr_split), '_class_', num2str(tr_action)];
 
-            generate_fourier_features(warped_features, savename, desired_frames);                           
+            generate_fourier_features(data.warped_features, savename, desired_frames);                           
 
 
             % Compute linear kernel from fourier features
             loadname = [directory, '/dtw_warped_fourier_features/warped_fourier_features_split_',...
                 num2str(tr_split), '_class_', num2str(tr_action)];
             data = load(loadname);   
-            pyramid_lf_fourier_features = data.pyramid_lf_fourier_features;
             
             savename = [directory, '/dtw_warped_pyramid_lf_fourier_kernels/',...
                 'warped_pyramid_lf_fourier_kernels_split_',...
                 num2str(tr_split), '_class_', num2str(tr_action)];
 
-            compute_kernels(pyramid_lf_fourier_features, savename);
+            compute_kernels(data.pyramid_lf_fourier_features, savename);
         end
     end
 

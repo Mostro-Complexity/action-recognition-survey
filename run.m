@@ -10,8 +10,7 @@
 %% super awesome model testing
 % written by others
 
-feature_types = {'absolute_joint_positions', 'relative_joint_positions', ...
-    'eigenjoints'};
+feature_types = {'eigenjoints'};
 
 datasets = {'MSRAction3D'};
 
