@@ -13,15 +13,17 @@ function [total_accuracy, class_wise_accuracy, confusion_matrix]...
     
     features_test = cell2mat(features_test');
     features_test = reshape(features_test, n_dim * n_frames, n_te_samples);
+         
+    low_model = fitcecoc(features_train' ,tr_labels, 'FitPosterior', 1);
+    high_model = fitcecoc(advanced_features_tr ,tr_labels, 'FitPosterior', 1, 'Learners',t);
     
-    features_train = [features_train;advanced_features_tr'];
-    features_test = [features_test;advanced_features_te'];
-     
-    model = fitcecoc(features_train',tr_labels);
+    [~, ~, ~, low_poster] = predict(low_model, features_test');
+    [~, ~, ~, high_poster] = predict(high_model, advanced_features_te);
     
-    predicted_labels = predict(model, features_test');
-
-    
+    poster = low_poster + high_poster;
+    [~, predicted_labels] = max(poster, [], 2);
+    predicted_labels = predicted_labels';
+        
     % evaluation
     class_wise_accuracy = zeros(n_classes, 1);    
     confusion_matrix = zeros(n_classes, n_classes);    

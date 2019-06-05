@@ -53,14 +53,7 @@ function [] = warped_pyramid_fourier_modeling(...
     disp ('Generating skeletal representation')
     generate_features(directory, datasets{dataset_idx}, feature_types{feature_idx}, desired_frames);
 
-    
-%     %% Dimensionality descent
-%     disp ('Dimensionality descent')
-%     data = load([directory, '/features'], 'features');
-%     features = reduce_dimensionality(data.features, 500);
-%     save([directory, '/features'], 'features');
-    
-    
+        
     %% Temporal modeling
     disp ('Temporal modeling')
     labels = load([directory, '/labels'], 'action_labels', 'subject_labels');
