@@ -1,55 +1,43 @@
-# STWP
-matlab code for 3D skeleton action recognition
-# [Spatio-Temporal Weighted Posture Motion Features for Skeleton-Based Action Recognition] 
-# by DING Chong-Yang and LIQ Kai(http://web.xidian.edu.cn/kailiu/).
-# Our recent work on 3D action recognition based on Raviteja Vemulapalli's work:
+# Action Recognition With Depth Sequences
+Matlab and Python code for graduation design of Qiu Siyu.
+
+[Research on Action and Behavior Recognition Technology Based on Kinect Somatosensory Information]
+
+By Nanjing Normal University Qiu Siyu.
 ************************************************************************************
-   Raviteja Vemulapalli, Felipe Arrate, and Rama Chellappa, "Human Action Recognition 
-   by Representing 3D Human Skeletons as Points in a Lie Group", CVPR, 2014.
-************************************************************************************
+## Experimental Environment
+* Matlab 2018b  
+* Anaconda 3.6
 
-please cite it if you are going to use it.
-
-************************************************************************************
-The code is implemented by Raviteja Vemulapalli and developed by us to mainly comparing the 
-performance of some different feature-extract methods, such as Joint locations, Joint angles, 
-Lie group and STWP(proposed by us, and turned out to be a better approach compared with others).
-
-This code has been implemented in Matlab R2017a and tested in both Linux (ubuntu) and Windows 7.
-
-
-# Experimental setting:
+## Experimental setting:
 
 Cross-subject - half of the subjects used for training and the remaining half used for testing.
 Results are averaged over 10 different training and test subject combinations.
 
 
-# Datasets
+## Datasets
 
 We provide pre-computed skeleton sequences for all the datasets supported:
 * [MSR Action 3D](http://research.microsoft.com/en-us/um/people/zliu/ActionRecoRsrc)
-* [UTKinect Action 3D](http://cvrc.ece.utexas.edu/KinectDatasets/HOJ3D.html)
-* [Florence 3D Actions](https://www.micc.unifi.it/resources/datasets/florence-3d-actions-dataset)
 
+## Run
 
-# Run
-
-The matlab file "run.m" runs the experiments for UTKinect-Action, Florence3D-Action and MSRAction3D datasets using 5 
-different skeletal representations: 'JP', 'RJP', 'JA', 'Lie Group' and 'STWP'.
+### For hand-craft features
+The matlab file "run.m" runs the experiments for UTKinect-Action, Florence3D-Action and MSRAction3D datasets using 4 
+different skeletal representations: 'absolute joint positions', 'relative joint positions', 'eigen joint', 'histograms of joint'.
 
 The file "skeletal_action_classification.m" contains the code for entire pipeline:
-Step 1: Skeletal representation ('JP' or 'RJP' or 'JA' or 'Lie Group' or 'STWP')
+Step 1: Skeletal representation ('absolute joint positions' or 'relative joint positions' or 'eigen joint' or 'histograms of joint')
 Step 2: Temporal modeling (DTW and Fourier Temporal Pyramid)
 Step 3: Classification: One-vs-All linear SVM (implemented as kernel SVM with linear kernel)
 
-# Results
+### For high-level learned features
+Use the file "get_cnn_advanced_features.py" and you will get high-level learned features as "*.mat" files.
 
-On the MSRAction3D dataset, which we have downloaded into this file, the recognition rates of  different skeletal 
-representations: 'JP', 'RJP', 'JA', 'Lie Group' and 'STWP' are:
+```python
+python get_cnn_advanced_features.py
+```
+## Results
 
-88.75%, 88.87%, 75.39%, 89.55%, 92.79%
+Due to problems in the implementation of some models, the experimental results are not ideal. The values in the results are for reference only.
 
-
-# Contact us
-
-For any query please contact us for more information (kailiu@mail.xidian.edu.cn).
